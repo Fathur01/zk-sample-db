@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+
+	<!-- Hibernate SessionFactory -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean"
+		name="sessionFactory">
+		<property name="dataSource" ref="dataSource" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+
+				<!--
+					In this sample app Hibernate creates the tables by starting the
+					app. <prop key="hibernate.hbm2ddl.auto">create</prop>
+				-->
+
+			</props>
+		</property>
+		<property name="mappingResources">
+			<list>
+				<value>de/forsthaus/backend/model/Artikel.hbm.xml
+				</value>
+				<value>de/forsthaus/backend/model/Auftrag.hbm.xml
+				</value>
+				<value>de/forsthaus/backend/model/Auftragposition.hbm.xml
+				</value>
+				<value>de/forsthaus/backend/model/Kunde.hbm.xml
+				</value>
+				<value>de/forsthaus/backend/model/Branche.hbm.xml
+				</value>
+				<value>de/forsthaus/backend/model/Nextidview.hbm.xml
+				</value>
+				<value>de/forsthaus/backend/model/SecGroup.hbm.xml
+				</value>
+				<value>de/forsthaus/backend/model/SecGroupright.hbm.xml
+				</value>
+				<value>de/forsthaus/backend/model/SecRight.hbm.xml
+				</value>
+				<value>de/forsthaus/backend/model/SecRole.hbm.xml
+				</value>
+				<value>de/forsthaus/backend/model/SecRolegroup.hbm.xml
+				</value>
+				<value>de/forsthaus/backend/model/SecUser.hbm.xml
+				</value>
+				<value>de/forsthaus/backend/model/SecUserrole.hbm.xml
+				</value>
+				<value>de/forsthaus/backend/model/SecLoginlog.hbm.xml
+				</value>
+				<value>de/forsthaus/backend/model/GuestBook.hbm.xml
+				</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="maxResults" value="2000" />
+	</bean>
+
+	<!-- base bean  -->
+	<bean id="basisDAO" abstract="true"
+		class="de.forsthaus.backend.dao.impl.BasisDAO">
+		<property name="hibernateTemplate" ref="hibernateTemplate" />
+	</bean>
+
+	<!-- bean for generating the primary keys -->
+	<bean id="basisfNextidview" abstract="true"
+		class="de.forsthaus.backend.dao.impl.BasisfNextidviewImpl" parent="basisDAO">
+		<property name="nextidviewDAO" ref="nextidviewDAO" />
+	</bean>
+
+	<!-- DAO's beans -->
+	<bean id="kundeDAO" class="de.forsthaus.backend.dao.impl.KundeDAOImpl"
+		parent="basisfNextidview" />
+	<bean id="auftragDAO" class="de.forsthaus.backend.dao.impl.AuftragDAOImpl"
+		parent="basisfNextidview" />
+	<bean id="auftragpositionDAO" class="de.forsthaus.backend.dao.impl.AuftragpositionDAOImpl"
+		parent="basisfNextidview">
+	</bean>
+	<bean id="artikelDAO" class="de.forsthaus.backend.dao.impl.ArtikelDAOImpl"
+		parent="basisfNextidview" />
+	<bean id="brancheDAO" class="de.forsthaus.backend.dao.impl.BrancheDAOImpl"
+		parent="basisfNextidview" />
+
+	<bean id="nextidviewDAO" class="de.forsthaus.backend.dao.impl.NextidviewDEMODAOImpl"
+		parent="basisDAO" />
+	<bean id="userDAO" class="de.forsthaus.backend.dao.impl.UserDAOImpl"
+		parent="basisfNextidview" />
+	<bean id="secGroupDAO" class="de.forsthaus.backend.dao.impl.SecGroupDAOImpl"
+		parent="basisfNextidview" />
+	<bean id="secGrouprightDAO" class="de.forsthaus.backend.dao.impl.SecGrouprightDAOImpl"
+		parent="basisfNextidview">
+		<property name="secRightDAO" ref="secRightDAO" />
+		<property name="secGroupDAO" ref="secGroupDAO" />
+	</bean>
+	<bean id="secRightDAO" class="de.forsthaus.backend.dao.impl.SecRightDAOImpl"
+		parent="basisfNextidview" />
+	<bean id="secRoleDAO" class="de.forsthaus.backend.dao.impl.SecRoleDAOImpl"
+		parent="basisfNextidview" />
+	<bean id="secRolegroupDAO" class="de.forsthaus.backend.dao.impl.SecRolegroupDAOImpl"
+		parent="basisfNextidview">
+		<property name="secRoleDAO" ref="secRoleDAO" />
+		<property name="secGroupDAO" ref="secGroupDAO" />
+	</bean>
+	<bean id="secUserroleDAO" class="de.forsthaus.backend.dao.impl.SecUserroleDAOImpl"
+		parent="basisfNextidview">
+		<property name="userDAO" ref="userDAO" />
+		<property name="secRoleDAO" ref="secRoleDAO" />
+	</bean>
+	<bean id="secTypDAO" class="de.forsthaus.backend.dao.impl.SecTypDAOImpl" />
+	<bean id="secLoginlogDAO" class="de.forsthaus.backend.dao.impl.SecLoginlogDAOImpl"
+		parent="basisfNextidview" />
+
+	<bean id="testDAO" class="de.forsthaus.backend.dao.impl.TestDAOImpl"
+		parent="basisDAO" />
+	<bean id="guestBookDAO" class="de.forsthaus.backend.dao.impl.GuestBookDAOImpl"
+		parent="basisfNextidview" />
+	<bean id="languageDAO" class="de.forsthaus.backend.dao.impl.LanguageDAOImpl" />
+
+
+	<!-- Service beans  -->
+	<bean name="kundeService" class="de.forsthaus.backend.service.impl.KundeServiceImpl">
+		<property name="kundeDAO" ref="kundeDAO" />
+	</bean>
+	<bean name="auftragService" class="de.forsthaus.backend.service.impl.AuftragServiceImpl">
+		<property name="auftragDAO" ref="auftragDAO" />
+		<property name="auftragpositionDAO" ref="auftragpositionDAO" />
+		<property name="kundeDAO" ref="kundeDAO" />
+		<property name="artikelDAO" ref="artikelDAO" />
+	</bean>
+	<bean name="brancheService" class="de.forsthaus.backend.service.impl.BrancheServiceImpl">
+		<property name="brancheDAO" ref="brancheDAO" />
+	</bean>
+	<bean name="artikelService" class="de.forsthaus.backend.service.impl.ArtikelServiceImpl">
+		<property name="artikelDAO" ref="artikelDAO" />
+	</bean>
+
+	<bean name="userService" class="de.forsthaus.backend.service.impl.UserServiceImpl">
+		<property name="userDAO" ref="userDAO" />
+		<property name="secUserroleDAO" ref="secUserroleDAO" />
+		<property name="secRoleDAO" ref="secRoleDAO" />
+		<property name="secRolegroupDAO" ref="secRolegroupDAO" />
+		<property name="secGrouprightDAO" ref="secGrouprightDAO" />
+		<property name="secGroupDAO" ref="secGroupDAO" />
+		<property name="languageDAO" ref="languageDAO" />
+	</bean>
+	<bean name="loginService" class="de.forsthaus.backend.service.impl.LoginServiceImpl">
+		<property name="userDAO" ref="userDAO" />
+	</bean>
+	<bean name="reportService" class="de.forsthaus.backend.service.impl.ReportServiceImpl">
+	</bean>
+	<bean name="securityService" class="de.forsthaus.backend.service.impl.SecurityServiceImpl">
+		<property name="userDAO" ref="userDAO" />
+		<property name="secUserroleDAO" ref="secUserroleDAO" />
+		<property name="secRoleDAO" ref="secRoleDAO" />
+		<property name="secRolegroupDAO" ref="secRolegroupDAO" />
+		<property name="secGrouprightDAO" ref="secGrouprightDAO" />
+		<property name="secGroupDAO" ref="secGroupDAO" />
+		<property name="secRightDAO" ref="secRightDAO" />
+		<property name="secTypDAO" ref="secTypDAO" />
+	</bean>
+
+	<bean name="loginLoggingService"
+		class="de.forsthaus.backend.service.impl.LoginLoggingServiceImpl">
+		<property name="secLoginlogDAO" ref="secLoginlogDAO" />
+	</bean>
+
+	<bean name="testService" class="de.forsthaus.backend.service.impl.TestServiceImpl">
+		<property name="testDAO" ref="testDAO" />
+	</bean>
+
+	<bean name="guestBookService"
+		class="de.forsthaus.backend.service.impl.GuestBookServiceImpl">
+		<property name="guestBookDAO" ref="guestBookDAO" />
+	</bean>
+</beans>
