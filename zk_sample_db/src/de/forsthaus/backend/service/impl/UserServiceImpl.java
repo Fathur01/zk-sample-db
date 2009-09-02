@@ -148,9 +148,10 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<SecRight> getRightsByUser(SecUser user) {
 
-		List resultList = new ArrayList<SecRight>();
+		List rightList = new ArrayList<SecRight>();
 
 		// 1. erst die zum User zugeteilten Rollen ermitteln
+		// 1. First get the roles that are attached to a user
 		List<SecRole> listRoles = new ArrayList<SecRole>();
 		listRoles = getRolesByUser(user);
 
@@ -163,6 +164,7 @@ public class UserServiceImpl implements UserService {
 		}
 
 		// 2. die zu den Rollen die zugehörigen Gruppen ermitteln
+		// 2. get the groups that belongs to the roles
 		List<SecGroup> listGroup = new ArrayList<SecGroup>();
 
 		if (listRoles != null) {
@@ -189,6 +191,7 @@ public class UserServiceImpl implements UserService {
 		}
 
 		// 3. zu den Gruppen die zugeordneten Rechte ermitteln
+		// 3. get the rights that belongs to the groups
 		List<SecRight> listRight = new ArrayList<SecRight>();
 
 		if (listGroup != null) {
@@ -214,28 +217,25 @@ public class UserServiceImpl implements UserService {
 		}
 
 		// 4. Doppelte Rechte unterdrücken
-		// List decorateList = SetUniqueList.decorate(listMenuCategory);
-
+		// 4. filter double rights out
 		if (listRight != null) {
 
-			List decorateList = SetUniqueList.decorate(resultList);
+			List decorateList = SetUniqueList.decorate(rightList);
 			for (int i = 0; i < listRight.size(); i++) {
-				//listMenuCategory.add(listMenuItem.get(i).getSysMenuCategory())
-				// ;
 				decorateList.add(listRight.get(i));
 			}
 		}
 
 		if (logger.isDebugEnabled()) {
 			logger.info("--> Decorated List");
-			if (resultList != null) {
-				for (SecRight secRight : (List<SecRight>) resultList) {
+			if (rightList != null) {
+				for (SecRight secRight : (List<SecRight>) rightList) {
 					logger.info(secRight.getRigName());
 				}
 			}
 		}
 
-		return resultList;
+		return rightList;
 	}
 
 	@Override
