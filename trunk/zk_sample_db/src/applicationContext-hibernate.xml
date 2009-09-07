@@ -129,6 +129,8 @@
 		parent="basisfNextidview" />
 	<bean id="languageDAO" class="de.forsthaus.backend.dao.impl.LanguageDAOImpl" />
 
+	<bean id="chartDataDAO" class="de.forsthaus.backend.dao.impl.ChartDataDAOImpl" />
+
 
 	<!-- Service beans  -->
 	<bean name="kundeService" class="de.forsthaus.backend.service.impl.KundeServiceImpl">
@@ -185,4 +187,10 @@
 		class="de.forsthaus.backend.service.impl.GuestBookServiceImpl">
 		<property name="guestBookDAO" ref="guestBookDAO" />
 	</bean>
+
+	<bean name="chartService" class="de.forsthaus.backend.service.impl.ChartServiceImpl">
+		<property name="chartDataDAO" ref="chartDataDAO" />
+	</bean>
+
+
 </beans>
